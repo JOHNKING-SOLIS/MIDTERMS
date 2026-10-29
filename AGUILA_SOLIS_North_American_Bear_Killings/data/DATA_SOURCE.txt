@@ -1,0 +1,4 @@
+Dataset: North American Bear Killings
+Expected filename: north_america_bear_killings.csv
+
+The CSV dataset was not included with the uploaded notebook, so it is not bundled in this project folder. Add the original dataset source URL and license/attribution here before submission. If the dataset file is available and permitted to redistribute, place it in this data/ folder.

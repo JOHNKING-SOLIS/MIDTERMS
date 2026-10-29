@@ -1,0 +1,45 @@
+
+digraph G {
+ graph [rankdir=TB, bgcolor="#111111", pad="0.25", nodesep="0.28", ranksep="0.35", splines=ortho, fontname="Arial", labelloc="t", label="DATA CLEANING & VISUALIZATION FLOWCHART\nNorth American Bear Killings", fontsize=22, fontcolor="white"];
+ node [shape=box, style="filled,rounded", fillcolor="#168fc2", color="#168fc2", fontname="Arial", fontsize=10, fontcolor="#061b28", margin="0.16,0.10", width=4.1];
+ edge [color="#eeeeee", fontcolor="white", fontname="Arial", fontsize=9, arrowsize=0.7];
+ start [label="START", shape=oval, fillcolor="#a4e0a6", color="#a4e0a6", fontcolor="#102b15", width=1.6];
+ load [label="1. Load north_america_bear_killings.csv\ninto a pandas DataFrame"];
+ inspect [label="2. Inspect shape, column names, data types,\nsummary statistics, unique values, missing values,\nand exact duplicate count"];
+ missing [label="3. Are there missing values or blank text fields?", shape=diamond, style=filled, fillcolor="#6b4510", color="#bd8a37", fontcolor="white", width=2.5, height=1.0];
+ missyes [label="YES: Trim text and standardize blanks.\nFill missing gender with 'Unknown'.\nKeep other missing values; do not invent details."];
+ missno [label="NO: Keep values unchanged.\nRecord missing-value check."];
+ dup [label="4. Are there exact duplicate rows?", shape=diamond, style=filled, fillcolor="#6b4510", color="#bd8a37", fontcolor="white", width=2.4, height=1.0];
+ dupyes [label="YES: Remove exact duplicate rows.\nRecord rows before and after."];
+ dupno [label="NO: Keep all rows.\nRecord duplicate count."];
+ types [label="5. Correct data types and column labels:\nstandardize labels; convert age to numeric;\nparse Date; correct Month/Year from valid Date;\nconvert numeric flags to nullable integers."];
+ outlier [label="6. Are there potential age outliers?\nUse the IQR rule (1.5 × IQR).", shape=diamond, style=filled, fillcolor="#6b4510", color="#bd8a37", fontcolor="white", width=2.5, height=1.0];
+ outyes [label="YES: Flag potential age outliers for review.\nRetain rows; do not delete valid extremes automatically."];
+ outno [label="NO / age unavailable: Leave values unchanged\nand record the check."];
+ feature [label="7. Feature engineering from Date:\nincident_month, incident_year, incident_decade,\nand incident_season (when valid Date exists)."];
+ encode [label="8. Encode categorical variables for model-ready data:\none-hot encode gender, Type, and Type of bear.\nExclude Name, Location, Description, and raw Date\nfrom model-ready features."];
+ scale [label="9. Scale numerical features where appropriate:\napply StandardScaler to valid age values to create\nage_scaled; keep original age unchanged."];
+ save [label="10. Save outputs:\ncleaned_north_america_bear_killings.csv\nand model_ready_bear_killings.csv.\nKeep the original dataset unchanged."];
+ validate [label="11. Validate saved cleaned data:\nreload CSV, compare shapes, check duplicate rows,\nmissing values, and selected data types."];
+ vizstart [label="12. Start visualization loop: set i = 1;\nprepare the 10 planned plot types."];
+ vdecision [label="Have all 10 visualizations been created?", shape=diamond, style=filled, fillcolor="#6b4510", color="#bd8a37", fontcolor="white", width=2.5, height=1.0];
+ viz [label="NO: Create the next plot, add clear title/labels,\nand write a short insight caption:\n1 Bear type counts  2 Incidents by month\n3 Incidents by year  4 Age distribution\n5 Age by bear type  6 Wild vs captive\n7 Incidents by gender  8 Month by bear type\n9 Age vs incident year  10 Incident flags"];
+ increment [label="i = i + 1; repeat visualization check", width=2.7];
+ review [label="YES: Review all titles, labels, legends,\nreadable scales, and insight captions."];
+ end [label="END", shape=oval, fillcolor="#a4e0a6", color="#a4e0a6", fontcolor="#102b15", width=1.6];
+ start -> load -> inspect -> missing;
+ missing -> missyes [label="Yes"]; missing -> missno [label="No"];
+ missyes -> dup; missno -> dup;
+ dup -> dupyes [label="Yes"]; dup -> dupno [label="No"];
+ dupyes -> types; dupno -> types;
+ types -> outlier;
+ outlier -> outyes [label="Yes"]; outlier -> outno [label="No"];
+ outyes -> feature; outno -> feature;
+ feature -> encode -> scale -> save -> validate -> vizstart -> vdecision;
+ vdecision -> review [label="Yes"]; vdecision -> viz [label="No"];
+ viz -> increment -> vdecision [label="Repeat"];
+ review -> end;
+ {rank=same; missyes; missno}
+ {rank=same; dupyes; dupno}
+ {rank=same; outyes; outno}
+}
